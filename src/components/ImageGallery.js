@@ -20,7 +20,8 @@ function ImageGallery() {
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
-
+    // updated images
+    
     const updatedImages = [...images];
     const [movedImage] = updatedImages.splice(result.source.index, 1);
     updatedImages.splice(result.destination.index, 0, movedImage);
@@ -34,7 +35,7 @@ function ImageGallery() {
     }));
     setImages(updatedImages);
   };
-
+// select method
   const handleSelectImage = (imageId) => {
     const updatedImages = images.map((image) => {
       if (image.id === imageId) {
@@ -46,12 +47,13 @@ function ImageGallery() {
   };
 
   const areAnyImagesSelected = images.some((image) => image.selected);
-
+// delete select image
   const deleteSelectedImages = () => {
     const updatedImages = images.filter((image) => !image.selected);
     setImages(updatedImages);
   };
 
+// image uploade
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -112,6 +114,7 @@ function ImageGallery() {
                         }`}
                         onClick={() => handleSelectImage(image.id)}
                       >
+                        {/* image gallery */}
                         <input
                           type="checkbox"
                           checked={image.selected}
@@ -130,6 +133,8 @@ function ImageGallery() {
                     )}
                   </Draggable>
                 ))}
+
+                {/* image upload  */}
                 <label htmlFor="imageUpload" className="add-image-button">
                   <FaImages />
                   <span>Add Image</span>
