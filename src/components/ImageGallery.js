@@ -79,67 +79,79 @@ function ImageGallery() {
     }
   };
 
-  return (
-    <div className="imageGalleryWrap">
-      <h2 className="galleryHeadline">Image Gallery</h2>
-      <div className="imageGallery">
-        <div className="galleryTopBar">
-          <div className="selectedItemWrap">
+  // ... (previous code)
+
+return (
+  <div className="imageGalleryWrap">
+    <h2 className="galleryHeadline">Image Gallery</h2>
+    <div className="imageGallery">
+      <div className="galleryTopBar">
+        <div className="selectedItemWrap">
+          <input
+            type="checkbox"
+            onChange={() => {
+              const updatedImages = images.map((image) => ({
+                ...image,
+                selected: true,
+              }));
+              setImages(updatedImages);
+            }}
+          />
+        <h2 className="galleryHeadline">
+  {images.filter((image) => image.selected).length === 0
+    ? "Image Gallery"
+    : `${images.filter((image) => image.selected).length} Files Selected`}
+</h2>
+        </div>
+        <button onClick={deleteSelectedImages}>Delete Files</button>
+      </div>
+      <div className="gallery">
+        {images.map((image) => (
+          <div
+            key={image.id}
+            className={`img ${image.selected ? "selected-image" : ""}`}
+            draggable="true"
+            onDragStart={(e) => handleDragStart(e, image)}
+            onDragOver={(e) => handleDragOver(e)}
+            onDrop={(e) => handleDrop(e, image)}
+            onClick={() => handleSelectImage(image.id)}
+          >
             <input
               type="checkbox"
-              onChange={() => {
-                const updatedImages = images.map((image) => ({
-                  ...image,
-                  selected: true,
-                }));
-                setImages(updatedImages);
-              }}
+              checked={image.selected}
+              onChange={() => handleSelectImage(image.id)}
+              className="checkBox"
             />
-            <h3>{images.filter((image) => image.selected).length} Files Selected</h3>
+            <img
+              src={image.src}
+              alt="gallery"
+              className={`gallery-image ${
+                image.isFeature ? "feature-image" : "other-image"
+              }`}
+            />
           </div>
-          <button onClick={deleteSelectedImages}>Delete Files</button>
+        ))}
+        <div
+          className="img add-image-button-container"
+          onClick={() => document.getElementById("imageUpload").click()}
+        >
+          <label htmlFor="imageUpload" className="add-image-button">
+            <FaImages />
+            <span>Add Image</span>
+          </label>
         </div>
-        <div className="gallery">
-          {images.map((image) => (
-            <div
-              key={image.id}
-              className={`img ${image.selected ? "selected-image" : ""}`}
-              draggable="true"
-              onDragStart={(e) => handleDragStart(e, image)}
-              onDragOver={(e) => handleDragOver(e)}
-              onDrop={(e) => handleDrop(e, image)}
-              onClick={() => handleSelectImage(image.id)}
-            >
-              <input
-                type="checkbox"
-                checked={image.selected}
-                onChange={() => handleSelectImage(image.id)}
-                className="checkBox"
-              />
-              <img
-                src={image.src}
-                alt="gallery"
-                className={`gallery-image ${
-                  image.isFeature ? "feature-image" : "other-image"
-                }`}
-              />
-            </div>
-          ))}
-        </div>
-        <label htmlFor="imageUpload" className="add-image-button">
-          <FaImages />
-          <span>Add Image</span>
-        </label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          className="hidden hiddenFile"
-          id="imageUpload"
-        />
       </div>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="hidden hiddenFile"
+        id="imageUpload"
+      />
     </div>
-  );
+  </div>
+);
+
 }
 
 export default ImageGallery;
