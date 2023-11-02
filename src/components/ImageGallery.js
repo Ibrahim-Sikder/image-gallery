@@ -18,7 +18,7 @@ function ImageGallery() {
   ]);
 
   const [draggedImage, setDraggedImage] = useState(null);
-
+// drag and drop
   const handleDragStart = (e, image) => {
     setDraggedImage(image);
   };
@@ -40,15 +40,7 @@ function ImageGallery() {
 
     setDraggedImage(null);
   };
-
-  const toggleFeature = (imageId) => {
-    const updatedImages = images.map((image) => ({
-      ...image,
-      isFeature: image.id === imageId,
-    }));
-    setImages(updatedImages);
-  };
-
+// selected iamge 
   const handleSelectImage = (imageId) => {
     const updatedImages = images.map((image) => {
       if (image.id === imageId) {
@@ -58,12 +50,12 @@ function ImageGallery() {
     });
     setImages(updatedImages);
   };
-
+// delelte selected image
   const deleteSelectedImages = () => {
     const updatedImages = images.filter((image) => !image.selected);
     setImages(updatedImages);
   };
-
+// image upload 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -78,80 +70,88 @@ function ImageGallery() {
       e.target.value = null;
     }
   };
+// selected count 
+  const selectedImageCount = images.filter((image) => image.selected).length;
+  const isAnyImageSelected = selectedImageCount > 0;
+  const showGallery = !isAnyImageSelected;
 
-  // ... (previous code)
-
-return (
-  <div className="imageGalleryWrap">
-    <h2 className="galleryHeadline">Image Gallery</h2>
-    <div className="imageGallery">
-      <div className="galleryTopBar">
-        <div className="selectedItemWrap">
-          <input
-            type="checkbox"
-            onChange={() => {
-              const updatedImages = images.map((image) => ({
-                ...image,
-                selected: true,
-              }));
-              setImages(updatedImages);
-            }}
-          />
-        <h2 className="galleryHeadline">
-  {images.filter((image) => image.selected).length === 0
-    ? "Image Gallery"
-    : `${images.filter((image) => image.selected).length} Files Selected`}
-</h2>
-        </div>
-        <button onClick={deleteSelectedImages}>Delete Files</button>
-      </div>
-      <div className="gallery">
-        {images.map((image) => (
-          <div
-            key={image.id}
-            className={`img ${image.selected ? "selected-image" : ""}`}
-            draggable="true"
-            onDragStart={(e) => handleDragStart(e, image)}
-            onDragOver={(e) => handleDragOver(e)}
-            onDrop={(e) => handleDrop(e, image)}
-            onClick={() => handleSelectImage(image.id)}
-          >
-            <input
-              type="checkbox"
-              checked={image.selected}
-              onChange={() => handleSelectImage(image.id)}
-              className="checkBox"
-            />
-            <img
-              src={image.src}
-              alt="gallery"
-              className={`gallery-image ${
-                image.isFeature ? "feature-image" : "other-image"
-              }`}
-            />
+  return (
+    <div className="imageGalleryWrap">
+      <div className="imageGallery">
+        {showGallery ? (
+          <h2 className="galleryHead galleryTopBar">Gallery</h2>
+        ) : (
+          <div className="galleryTopBar">
+            <div className="selectedItemWrap">
+              <input
+                type="checkbox"
+                checked={selectedImageCount === images.length}
+                onChange={() => {
+                  const updatedImages = images.map((image) => ({
+                    ...image,
+                    selected: !isAnyImageSelected,
+                  }));
+                  setImages(updatedImages);
+                }}
+              />
+              <h2 className="galleryHeadline">
+                {`${selectedImageCount} Files Selected`}
+              </h2>
+            </div>
+            <button onClick={deleteSelectedImages}>Delete Files</button>
           </div>
-        ))}
-        <div
-          className="img add-image-button-container"
-          onClick={() => document.getElementById("imageUpload").click()}
-        >
-          <label htmlFor="imageUpload" className="add-image-button">
-            <FaImages />
-            <span>Add Image</span>
-          </label>
+        )}
+        <div className="gallery">
+          {images.map((image) => (
+            <div
+              key={image.id}
+              className={`img ${image.selected ? "selected-image" : ""}`}
+              draggable="true"
+              onDragStart={(e) => handleDragStart(e, image)}
+              onDragOver={(e) => handleDragOver(e)}
+              onDrop={(e) => handleDrop(e, image)}
+              onClick={() => handleSelectImage(image.id)}
+            >
+              {showGallery ? null : (
+                <input
+                  type="checkbox"
+                  checked={image.selected}
+                  onChange={() => handleSelectImage(image.id)}
+                  className="checkBox"
+                />
+              )}
+              <img
+                src={image.src}
+                alt="gallery"
+                className={`gallery-image ${
+                  image.isFeature ? "feature-image" : "other-image"
+                }`}
+              />
+            </div>
+          ))}
+         
+            <div
+              className="img add-image-button-container"
+              onClick={() => document.getElementById("imageUpload").click()}
+            >
+              <label htmlFor="imageUpload" className="add-image-button">
+                <FaImages />
+                <span>Add Image</span>
+              </label>
+              <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          className="hidden hiddenFile"
+          id="imageUpload"
+        />
+            </div>
+         
         </div>
+       
       </div>
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleImageUpload}
-        className="hidden hiddenFile"
-        id="imageUpload"
-      />
     </div>
-  </div>
-);
-
+  );
 }
 
 export default ImageGallery;
