@@ -18,7 +18,7 @@ function ImageGallery() {
   ]);
 
   const [draggedImage, setDraggedImage] = useState(null);
-
+  // drag & drop
   const handleDragStart = (e, image) => {
     setDraggedImage(image);
   };
@@ -29,8 +29,12 @@ function ImageGallery() {
 
   const handleDrop = (e, targetImage) => {
     const updatedImages = images.slice();
-    const draggedIndex = updatedImages.findIndex((image) => image === draggedImage);
-    const targetIndex = updatedImages.findIndex((image) => image === targetImage);
+    const draggedIndex = updatedImages.findIndex(
+      (image) => image === draggedImage
+    );
+    const targetIndex = updatedImages.findIndex(
+      (image) => image === targetImage
+    );
 
     if (draggedIndex !== -1 && targetIndex !== -1) {
       updatedImages.splice(draggedIndex, 1);
@@ -40,7 +44,7 @@ function ImageGallery() {
 
     setDraggedImage(null);
   };
-
+  // image selected
   const handleSelectImage = (imageId) => {
     const updatedImages = images.map((image) => {
       if (image.id === imageId) {
@@ -50,12 +54,12 @@ function ImageGallery() {
     });
     setImages(updatedImages);
   };
-
+  // delete selected image
   const deleteSelectedImages = () => {
     const updatedImages = images.filter((image) => !image.selected);
     setImages(updatedImages);
   };
-
+  // image upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -67,10 +71,10 @@ function ImageGallery() {
         selected: false,
       };
       setImages([...images, newImage]);
-      e.target.value = null; 
+      e.target.value = null;
     }
   };
-
+  // selected image count
   const selectedImageCount = images.filter((image) => image.selected).length;
   const isAnyImageSelected = selectedImageCount > 0;
   const showGallery = !isAnyImageSelected;
@@ -129,19 +133,19 @@ function ImageGallery() {
               />
             </div>
           ))}
-         <div className="img add-image-button-container">
-  <label htmlFor="imageUpload" className="add-image-button">
-    <FaImages />
-    <span>Add Image</span>
-  </label>
-  <input
-    type="file"
-    accept="image/*"
-    onChange={handleImageUpload}
-    className="hidden hiddenFile"
-    id="imageUpload"
-  />
-</div>
+          <div className="img add-image-button-container">
+            <label htmlFor="imageUpload" className="add-image-button">
+              <FaImages />
+              <span>Add Image</span>
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden hiddenFile"
+              id="imageUpload"
+            />
+          </div>
         </div>
       </div>
     </div>
