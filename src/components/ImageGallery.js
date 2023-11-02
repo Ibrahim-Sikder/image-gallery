@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./Gallery.css";
 import { FaImages } from "react-icons/fa";
 
 function ImageGallery() {
   const [images, setImages] = useState([
     { id: "image-1", src: "/image-1.webp", isFeature: true, selected: false },
-    { id: "image-2", src: "image-2.webp", isFeature: false, selected: false },
+    { id: "image-2", src: "/image-2.webp", isFeature: true, selected: false },
     { id: "image-3", src: "image-3.webp", isFeature: false, selected: false },
     { id: "image-4", src: "image-4.webp", isFeature: false, selected: false },
     { id: "image-5", src: "image-5.webp", isFeature: false, selected: false },
@@ -18,14 +17,28 @@ function ImageGallery() {
     { id: "image-11", src: "image-11.jpeg", isFeature: false, selected: false },
   ]);
 
-  const onDragEnd = (result) => {
-    if (!result.destination) return;
-    // updated images
-    
-    const updatedImages = [...images];
-    const [movedImage] = updatedImages.splice(result.source.index, 1);
-    updatedImages.splice(result.destination.index, 0, movedImage);
-    setImages(updatedImages);
+  const [draggedImage, setDraggedImage] = useState(null);
+
+  const handleDragStart = (e, image) => {
+    setDraggedImage(image);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e, targetImage) => {
+    const updatedImages = images.slice();
+    const draggedIndex = updatedImages.findIndex((image) => image === draggedImage);
+    const targetIndex = updatedImages.findIndex((image) => image === targetImage);
+
+    if (draggedIndex !== -1 && targetIndex !== -1) {
+      updatedImages.splice(draggedIndex, 1);
+      updatedImages.splice(targetIndex, 0, draggedImage);
+      setImages(updatedImages);
+    }
+
+    setDraggedImage(null);
   };
 
   const toggleFeature = (imageId) => {
@@ -35,7 +48,7 @@ function ImageGallery() {
     }));
     setImages(updatedImages);
   };
-// select method
+
   const handleSelectImage = (imageId) => {
     const updatedImages = images.map((image) => {
       if (image.id === imageId) {
@@ -46,14 +59,11 @@ function ImageGallery() {
     setImages(updatedImages);
   };
 
-  const areAnyImagesSelected = images.some((image) => image.selected);
-// delete select image
   const deleteSelectedImages = () => {
     const updatedImages = images.filter((image) => !image.selected);
     setImages(updatedImages);
   };
 
-// image uploade
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -71,86 +81,62 @@ function ImageGallery() {
 
   return (
     <div className="imageGalleryWrap">
-      <h2 className="gallaryHeadline">Image Gallery</h2>
+      <h2 className="galleryHeadline">Image Gallery</h2>
       <div className="imageGallery">
         <div className="galleryTopBar">
           <div className="selectedItemWrap">
             <input
               type="checkbox"
-              checked={areAnyImagesSelected}
               onChange={() => {
                 const updatedImages = images.map((image) => ({
                   ...image,
-                  selected: !areAnyImagesSelected,
+                  selected: true,
                 }));
                 setImages(updatedImages);
               }}
             />
-            <h3> {images.filter((image) => image.selected).length} Files Selected</h3>
+            <h3>{images.filter((image) => image.selected).length} Files Selected</h3>
           </div>
           <button onClick={deleteSelectedImages}>Delete Files</button>
         </div>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="gallery" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="gallery"
-              >
-                {images.map((image, index) => (
-                  <Draggable
-                    key={image.id}
-                    draggableId={image.id}
-                    index={index}
-                  >
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className={`img ${
-                          image.selected ? "selected-image" : ""
-                        }`}
-                        onClick={() => handleSelectImage(image.id)}
-                      >
-                        {/* image gallery */}
-                        <input
-                          type="checkbox"
-                          checked={image.selected}
-                          onChange={() => handleSelectImage(image.id)}
-                          className="checkBox"
-                        />
-                        <img
-                          src={image.src}
-                          alt="gallery"
-                          className={`w-full h-auto ${
-                            image.isFeature ? "feature-image" : "other-image"
-                          }`}
-                          style={{ pointerEvents: image.selected ? "none" : "auto" }}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-
-                {/* image upload  */}
-                <label htmlFor="imageUpload" className="add-image-button">
-                  <FaImages />
-                  <span>Add Image</span>
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden hiddenFile"
-                  id="imageUpload"
-                />
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+        <div className="gallery">
+          {images.map((image) => (
+            <div
+              key={image.id}
+              className={`img ${image.selected ? "selected-image" : ""}`}
+              draggable="true"
+              onDragStart={(e) => handleDragStart(e, image)}
+              onDragOver={(e) => handleDragOver(e)}
+              onDrop={(e) => handleDrop(e, image)}
+              onClick={() => handleSelectImage(image.id)}
+            >
+              <input
+                type="checkbox"
+                checked={image.selected}
+                onChange={() => handleSelectImage(image.id)}
+                className="checkBox"
+              />
+              <img
+                src={image.src}
+                alt="gallery"
+                className={`gallery-image ${
+                  image.isFeature ? "feature-image" : "other-image"
+                }`}
+              />
+            </div>
+          ))}
+        </div>
+        <label htmlFor="imageUpload" className="add-image-button">
+          <FaImages />
+          <span>Add Image</span>
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          className="hidden hiddenFile"
+          id="imageUpload"
+        />
       </div>
     </div>
   );
